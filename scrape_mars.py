@@ -1,17 +1,16 @@
 # import necessary libraries
-from flask import Flask, render_template
 
-# create instance of Flask app
-app = Flask(__name__)
+import pandas as pd
+from splinter import Browser
+from bs4 import BeautifulSoup
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 
 # create route that renders index.html template
-@app.route("/scrape")
+
 def scrape():
-    import pandas as pd
-    from splinter import Browser
-    from bs4 import BeautifulSoup
-    from webdriver_manager.chrome import ChromeDriverManager
+    
 
     # Setup splinter
     executable_path = {'executable_path': ChromeDriverManager().install()}
@@ -84,6 +83,8 @@ def scrape():
         browser.back()
     browser.quit()
 
+    return mars_dict
 
+    
 if __name__ == "__main__":
     app.run(debug=True)
