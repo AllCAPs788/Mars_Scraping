@@ -85,6 +85,7 @@ def scrape():
 
     return mars_dict
 
-    
-if __name__ == "__main__":
-    app.run(debug=True)
+    print(mars_dict)
+#if __name__ == "__main__":
+    #app.run(debug=True)
+scrape()
