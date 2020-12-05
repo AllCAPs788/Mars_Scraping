@@ -21,11 +21,11 @@ def scrape():
     news_url = 'https://mars.nasa.gov/news/?page=0&per_page=40&order=publish_date+desc%2Ccreated_at+desc&search=&category=19%2C165%2C184%2C204&blank_scope=Latest'
     browser.visit(news_url)
     #soup = BeautifulSoup(html, 'html.parser')
-
-        # HTML object
-
+    html = browser.html
     # Parse HTML with Beautiful Soup
     soup = BeautifulSoup(html, 'html.parser')
+
+       
     # Retrieve all elements that contain book information
     article_title = soup.find(class_='content_title')
     article_text = soup.find(class_='article_teaser_body')
@@ -36,30 +36,52 @@ def scrape():
 
     image_url = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
     browser.visit(image_url)
+    html = browser.html
     soup = BeautifulSoup(html, 'html.parser')
 
-    image = soup.find('li',class_='slide')
+    image = soup.find('img',class_='thumb')
 
     print(image)
 
     facts_url = 'https://space-facts.com/mars/'
     browser.visit(facts_url)
+    html = browser.html
     soup = BeautifulSoup(html, 'html.parser')
 
-    table = soup.find(id='tablepress-p-mars-no-2')
-    print(table)
+    tables = pd.read_html(facts_url)
+    tables
 
     hemisphere_url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
     browser.visit(hemisphere_url)
+    html = browser.html
     soup = BeautifulSoup(html, 'html.parser')
 
-    hemisphere_image_urls = [
-        {"Valles": "Valles Marineris Hemisphere", src="/cache/images/4e59980c1c57f89c680c0e1ccabbeff1_valles_marineris_enhanced.tif_thumb.png"},
-        {"title": "Cerberus Hemisphere", src="/cache/images/39d3266553462198bd2fbc4d18fbed17_cerberus_enhanced.tif_thumb.png"},
-        {"title": "Schiaparelli Hemisphere", src="/cache/images/08eac6e22c07fb1fe72223a79252de20_schiaparelli_enhanced.tif_thumb.png"},
-        {"title": "Syrtis Major Hemisphere", src="/cache/images/55a0a1e2796313fdeafb17c35925e8ac_syrtis_major_enhanced.tif_thumb.png"}]
+    h3_loop = soup.find_all('h3')
 
+    h3_list = []
+    for x in h3_loop:
+        h3_list.append(x.text)
+        
+    print(h3_list)
+    hemisphere_image_urls = []
 
+    for x in h3_list:
+        
+
+        
+        mars_dict = {}
+        browser.click_link_by_partial_text(x)
+        html = browser.html
+        soup = BeautifulSoup(html, 'html.parser')
+        mars_title = soup.find('h2', class_="title")
+        sample_1 = soup.find('img',class_="wide-image")
+                
+        print(sample_1['src'])           
+        mars_dict['title']=mars_title.text
+        mars_dict['image_url']=sample_1['src']
+        
+        hemisphere_image_urls.append(mars_dict)
+        browser.back()
     browser.quit()
 
 
