@@ -38,8 +38,9 @@ def scrape():
     html = browser.html
     soup = BeautifulSoup(html, 'html.parser')
 
-    image = soup.find('img',class_='thumb')
-
+    image = soup.find('img',class_='thumb').get('src')
+    image = 'https://www.jpl.nasa.gov' + image
+    
     print(image)
 
     facts_url = 'https://space-facts.com/mars/'
@@ -47,9 +48,9 @@ def scrape():
     html = browser.html
     soup = BeautifulSoup(html, 'html.parser')
 
-    tables = pd.read_html(facts_url)
-    tables
-
+    tables = pd.read_html(facts_url)[0]
+    tables.columns = ['Desc', 'Mars']
+    tables = tables.set_index('Desc').to_html()
     hemisphere_url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
     browser.visit(hemisphere_url)
     html = browser.html
@@ -73,19 +74,24 @@ def scrape():
         html = browser.html
         soup = BeautifulSoup(html, 'html.parser')
         mars_title = soup.find('h2', class_="title")
-        sample_1 = soup.find('img',class_="wide-image")
-                
+        sample_1 = soup.find('img',class_="wide-image").get('src')
+        sample_1 = 'https://astrogeology.usgs.gov' + sample_1        
         print(sample_1['src'])           
         mars_dict['title']=mars_title.text
         mars_dict['image_url']=sample_1['src']
         
         hemisphere_image_urls.append(mars_dict)
         browser.back()
-    browser.quit()
+    
+        scraped_data = {
+            "title": article_title.text,
+            "paragraph": article_text.text,
+            "image": image,
+            "mars_tables": tables,
+            "hemispheres": mars_dict  
+        }
 
-    return mars_dict
-
-    print(mars_dict)
-#if __name__ == "__main__":
-    #app.run(debug=True)
-scrape()
+        
+        browser.quit()
+        return scraped_data
+        
